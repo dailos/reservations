@@ -27,6 +27,11 @@ You can adjust some params in `config/availability.php` file:
 - `reception_time`:  In minutes, the period of time the max_in_reception customers will be evaluated
 - `max_cleaning`:  Max number of cleanings that can run in parallel
 - `cleaning_time`: In minutes, duration of the cleaning period to be evaluated
+- `opening_hour`: Facilities opening hour, integer
+- `closing_hour`:  Facilities closing hour, integer
+- `reservation_steps`: In minutes, reservation steps, for example, every 10 minutes
+- `min_reservation_duration`: In hours, min duration of a reservation
+- `max_reservation_duration`: In hours, max duration of a reservation
 
 ### Running the simulation
 Run the simulation: `sail artisan reservation:free`
