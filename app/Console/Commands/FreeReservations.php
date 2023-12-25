@@ -12,14 +12,14 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use JetBrains\PhpStorm\ArrayShape;
 
-class GenerateReservations extends Command
+class FreeReservations extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'reservation:generate';
+    protected $signature = 'reservation:free';
 
     /**
      * The console command description.
@@ -57,27 +57,27 @@ class GenerateReservations extends Command
             }
         }
 
-
         $statistics = $statisticsService->getStatistics($location,
-            Carbon::createFromFormat( 'd/m/Y H:i', self::DATE.'10:00'));
+            Carbon::createFromFormat( 'd/m/Y H:i', self::DATE.config('availability.opening_hour').':00'));
 
         $statistics->print();
     }
 
     #[ArrayShape(['start' => "string", 'end' => "string"])] private function generateReservation() : array
     {
-        $startHour = random_int(10,22);
-        $maxDuration = max(min(23 - $startHour, 4), 2);
-        $startMinute = array_rand(array_flip(['00', '10', '20', '30', '40', '50']), 1);
-        if($startHour === 22) {
-            $startMinute = '00';
-        }
-        $endHour = $startHour + random_int(2,$maxDuration);
-        $startHourMinute = "$startHour:$startMinute";
-        $endHourMinute = "$endHour:$startMinute";
+        $startHour = random_int(
+                                config('availability.opening_hour'),
+                                config('availability.closing_hour') -  config('availability.min_reservation_duration')
+                    );
+        $duration = random_int(config('availability.min_reservation_duration'),config('availability.max_reservation_duration'));
+        $minute = array_rand(array_flip(['00', '10', '20', '30', '40', '50']), 1);
+        $endHour = $startHour + $duration;
+        $startHourMinute = "$startHour:$minute";
+        $endHourMinute = "$endHour:$minute";
         return [
             'start' => $startHourMinute,
             'end' => $endHourMinute
         ];
     }
 }
+

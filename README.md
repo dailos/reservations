@@ -1,7 +1,34 @@
-copy the .env.example to .env
+## To run the simulation you only need docker.
 
-Run the seeder:
-sail artisan db:seed
+### Installation
 
-run the simulation:
-sail artisan reservation:generate
+1. copy the .env.example to .env: `cp .env.example .env`
+2. if you don't have local php: 
+   
+  `docker run --rm \
+   -u "$(id -u):$(id -g)" \
+   -v $(pwd):/opt \
+   -w /opt \
+   laravelsail/php82-composer:latest \
+   composer install`
+  
+otherwise, just run `composer install`
+
+3. Start the environment: `sail up -d`
+
+4. You may need to create an APP Key : `sail artisan key:generate`
+5. Run the migration: `sail artisan migrate`
+
+6. Run the seeder: `sail artisan db:seed` , it will create 2 locations, Essen with 14 nests and Hamburg with 19
+
+### Configuration
+You can adjust some params in `config/availability.php` file:
+- `max_in_reception`: Max number of customer that are allowed to be in reception
+- `reception_time`:  In minutes, the period of time the max_in_reception customers will be evaluated
+- `max_cleaning`:  Max number of cleanings that can run in parallel
+- `cleaning_time`: In minutes, duration of the cleaning period to be evaluated
+
+### Running the simulation
+Run the simulation: `sail artisan reservation:free`
+
+The output will 
