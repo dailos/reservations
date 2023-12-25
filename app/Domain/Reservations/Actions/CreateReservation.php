@@ -1,33 +1,32 @@
 <?php
 
-namespace App\Actions;
+namespace App\Domain\Reservations\Actions;
 
+use App\Domain\Availability\Contracts\AvailabilityServiceInterface;
+use App\Domain\Reservations\Enums\Size;
 use App\Exceptions\NestNotAvailable;
 use App\Models\Location;
 use App\Models\Reservation;
-use App\Services\AvailabilityService;
 use Carbon\Carbon;
 
 class CreateReservation
 {
 
-    public function __construct(private readonly AvailabilityService $availabilityService)
-    {}
-
     /**
      * @param Location $location
      * @param string $start
-     * @param string $end
+     * @param Size $size
      * @param int $status
+     * @param AvailabilityServiceInterface $availabilityService
      * @return void
      * @throws NestNotAvailable
      */
-    public function create(Location $location, string $start, string $end, int $status): void
+    public function create(Location $location, string $start, Size $size, int $status, AvailabilityServiceInterface $availabilityService): void
     {
         $start = Carbon::createFromFormat( 'd/m/Y H:i', $start);
-        $end = Carbon::createFromFormat( 'd/m/Y H:i', $end)->addMinutes(config('availability.cleaning_time'));
+        $end = $start->copy()->addHours($size->value)->addMinutes(config('availability.cleaning_time'));
 
-        if($this->availabilityService->isNestAvailable($location, $start, $end )) {
+        if($availabilityService->isNestAvailable($location, $start, $end )) {
             Reservation::create([
                 'start' => $start,
                 'end' => $end,

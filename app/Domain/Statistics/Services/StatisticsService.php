@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Domain\Statistics\Services;
 
+use App\Domain\Statistics\Entities\Statistics;
 use App\Finders\ReservationFinder;
 use App\Models\Location;
-use App\Models\Statistics;
 use Carbon\Carbon;
 
 class StatisticsService

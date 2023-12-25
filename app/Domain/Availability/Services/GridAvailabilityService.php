@@ -1,28 +1,22 @@
 <?php
 
-namespace App\Services;
+namespace App\Domain\Availability\Services;
 
+use App\Domain\Availability\Contracts\AvailabilityServiceInterface;
 use App\Finders\ReservationFinder;
 use App\Models\Location;
 use Carbon\Carbon;
 
-class AvailabilityService
+class GridAvailabilityService implements AvailabilityServiceInterface
 {
 
-    private int $receptionTime;
-    private int $cleaningTime;
-    private int $maxCleaning;
-    private int $maxInReception;
 
     /**
      * @param ReservationFinder $reservationFinder
      */
     public function __construct(private readonly ReservationFinder $reservationFinder)
     {
-        $this->cleaningTime = config('availability.cleaning_time');
-        $this->receptionTime = config('availability.reception_time');
-        $this->maxCleaning = config('availability.max_cleaning');
-        $this->maxInReception = config('availability.max_in_reception');
+
     }
 
     /**

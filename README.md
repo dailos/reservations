@@ -34,6 +34,6 @@ You can adjust some params in `config/availability.php` file:
 - `max_reservation_duration`: In hours, max duration of a reservation
 
 ### Running the simulation
-Run the simulation: `sail artisan reservation:free`
+Run the simulation: `sail artisan reservation --type=<free/grip> --attempt=<2000>`
 
 The output will 
