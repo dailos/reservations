@@ -8,17 +8,21 @@ use Carbon\Carbon;
 
 class AvailabilityService
 {
-    private const MAX_IN_RECEPTION = 2;
-    private const RECEPTION_TIME = 10; //minutes
-    private const MAX_CLEANINGS = 2;
-    public const CLEANING_TIME = 15; //minutes
 
-
+    private int $receptionTime;
+    private int $cleaningTime;
+    private int $maxCleaning;
+    private int $maxInReception;
     /**
      * @param ReservationFinder $reservationFinder
      */
     public function __construct(private readonly ReservationFinder $reservationFinder)
-    {}
+    {
+        $this->cleaningTime = config('availability.cleaning_time');
+        $this->receptionTime = config('availability.reception_time');
+        $this->maxCleaning = config('availability.max_cleaning');
+        $this->maxInReception = config('availability.max_in_reception');
+    }
 
     /**
      * @param Location $location
@@ -32,8 +36,8 @@ class AvailabilityService
         $concurrentCleanings = 0;
         $concurrentCustomersInReception = 0;
         $reservations = $this->reservationFinder->getReservationsForLocation($location->id)->toArray();
-        $receptionEnd = $proposedStart->clone()->addMinutes(self::RECEPTION_TIME);
-        $cleaningStart = $proposedEnd->clone()->subMinutes(self::CLEANING_TIME);
+        $receptionEnd = $proposedStart->clone()->addMinutes($this->receptionTime);
+        $cleaningStart = $proposedEnd->clone()->subMinutes($this->cleaningTime);
 
         //checks overbooking
         foreach ($reservations as $reservation) {
@@ -49,23 +53,23 @@ class AvailabilityService
                 }
             }
             //checks customers in hall
-            $endHall = Carbon::make($reservation['start'])->addMinutes(self::RECEPTION_TIME);
+            $endHall = Carbon::make($reservation['start'])->addMinutes($this->receptionTime);
             if (($proposedStart->greaterThanOrEqualTo($start) && $proposedStart->lessThan($endHall)) ||
                 ($receptionEnd->greaterThan($start) && $receptionEnd->lessThanOrEqualTo($endHall)) ||
                 ($proposedStart->lessThanOrEqualTo($start) && $receptionEnd->greaterThanOrEqualTo($endHall))) {
 
                 $concurrentCustomersInReception++;
-                if ($concurrentCustomersInReception >= self::MAX_IN_RECEPTION) {
+                if ($concurrentCustomersInReception >= $this->maxInReception) {
                     return false;
                 }
             }
             //Checks concurrent cleanings
-            $startCleaning = Carbon::make($reservation['end'])->subMinutes(self::CLEANING_TIME);
+            $startCleaning = Carbon::make($reservation['end'])->subMinutes($this->cleaningTime);
             if (($cleaningStart->greaterThanOrEqualTo($startCleaning) && $cleaningStart->lessThan($end)) ||
                 ($proposedEnd->greaterThan($startCleaning) && $proposedEnd->lessThanOrEqualTo($end)) ||
                 ($cleaningStart->lessThanOrEqualTo($startCleaning) && $proposedEnd->greaterThanOrEqualTo($end))) {
                 $concurrentCleanings++;
-                if($concurrentCleanings >= self::MAX_CLEANINGS){
+                if($concurrentCleanings >= $this->maxCleaning){
                      return false;
                 }
             }

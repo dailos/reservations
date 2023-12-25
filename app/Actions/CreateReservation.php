@@ -25,7 +25,7 @@ class CreateReservation
     public function create(Location $location, string $start, string $end, int $status): void
     {
         $start = Carbon::createFromFormat( 'd/m/Y H:i', $start);
-        $end = Carbon::createFromFormat( 'd/m/Y H:i', $end)->addMinutes($this->availabilityService::CLEANING_TIME);
+        $end = Carbon::createFromFormat( 'd/m/Y H:i', $end)->addMinutes(config('availability.cleaning_time'));
 
         if($this->availabilityService->isNestAvailable($location, $start, $end )) {
             Reservation::create([

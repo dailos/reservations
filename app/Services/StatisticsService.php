@@ -36,7 +36,8 @@ class StatisticsService
             $slotPointer->addMinutes(self::STEP);
         }
 
-        return new Statistics($reservationMap, $location->nest_amount,
+        $totalReservations = $this->reservationFinder->getReservationsForLocation($location->id)->count();
+        return new Statistics($reservationMap,$totalReservations, $location->nest_amount,
                     self::CLOSING_HOUR - self::OPENING_HOUR );
     }
 
@@ -50,7 +51,6 @@ class StatisticsService
         $end = $start->clone()->addMinutes(self::STEP);
         return $this->reservationFinder->getReservedNestsInPeriod($location->id, $start, $end);
     }
-
 
 
 }

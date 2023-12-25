@@ -11,10 +11,12 @@ class Statistics
 
     /**
      * @param array $reservationMap
+     * @param int $totalReservations
      * @param int $numberOfNests
      * @param int $openingHours
      */
     public function __construct(private readonly array $reservationMap,
+                                private readonly int $totalReservations,
                                 private readonly int $numberOfNests,
                                 private readonly int $openingHours)
     {
@@ -28,6 +30,7 @@ class Statistics
     {
         print_r($this->getReservationMap());
         echo "Waste: " . $this->getWaste() . "%\n";
+        echo "Number of reservations: " . $this->getTotalReservations() . "\n";
     }
 
     /**
@@ -44,6 +47,14 @@ class Statistics
     private function getWaste(): float
     {
         return round($this->waste, 2);
+    }
+
+    /**
+     * @return int
+     */
+    private function getTotalReservations(): int
+    {
+        return $this->totalReservations;
     }
 
 
