@@ -76,14 +76,33 @@ class Reservations extends Command
                                 config('availability.opening_hour'),
                                 config('availability.closing_hour') -  config('availability.min_reservation_duration')
                     );
-        $duration = random_int(config('availability.min_reservation_duration'),config('availability.max_reservation_duration'));
-        $size = Size::fromHours($duration);
+        $size = Size::fromHours($this->getRandomDuration());
         $minute = array_rand(array_flip(['00', '10', '20', '30', '40', '50']), 1);
         $startHourMinute = "$startHour:$minute";
         return [
             'start' => $startHourMinute,
             'size' => $size,
         ];
+    }
+
+    private function getRandomDuration()
+    {
+        $min = config('availability.min_reservation_duration');
+        $max = config('availability.max_reservation_duration');
+        $weights = config('availability.weights');
+        $totalWeight = array_sum($weights);
+        $rand = random_int(1, $totalWeight);
+
+        foreach ($weights as $key => $weight) {
+            $rand -= $weight;
+            if ($rand <= 0) {
+                return $min + $key * (($max - $min) / count($weights));
+            }
+        }
+
+        // This should not happen, but just in case
+        return $min;
+
     }
 }
 

@@ -10,4 +10,5 @@ return [
     'reservation_steps' => 10, // In minutes, reservation steps
     'min_reservation_duration' => 2, // In hours, min duration of a reservation
     'max_reservation_duration' => 5, // In hours, max duration of a reservation
+    'weights' => [5, 3, 2, 1],
 ];
